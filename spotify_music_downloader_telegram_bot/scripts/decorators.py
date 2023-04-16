@@ -18,6 +18,7 @@ def get_attributes(need_attributes: tuple):
             if update.effective_message is not None:
                 attributes.update(
                     {
+                        'message_id': update.effective_message.message_id,
                         'message': update.effective_message.text,
                     }
                 )
