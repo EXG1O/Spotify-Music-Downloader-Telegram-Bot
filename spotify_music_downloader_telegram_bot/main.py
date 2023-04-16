@@ -9,8 +9,8 @@ def main() -> None:
 		with open('./data/spotify_music_downloader_telegram_bot.token', 'r') as spotify_music_downloader_telegram_bot_token_file:
 			spotify_music_downloader_telegram_bot_token = spotify_music_downloader_telegram_bot_token_file.read()
 	else:
-		with open('./data/spotify_music_downloader_telegram_bot.token', 'w') as spotify_music_downloader_telegram_bot_token_file:
-			spotify_music_downloader_telegram_bot_token = spotify_music_downloader_telegram_bot_token_file.read()
+		open('./data/spotify_music_downloader_telegram_bot.token', 'w')
+		spotify_music_downloader_telegram_bot_token = ''
 
 	if spotify_music_downloader_telegram_bot_token == '':
 		print('Enter the Constructor Telegram bot token in the file ./data/spotify_music_downloader_telegram_bot.token!')
