@@ -13,6 +13,7 @@ python -m venv env
 source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
+spotdl --download-ffmpeg
 cd spotify_music_downloader_telegram_bot
 ```
 2. Запускаем Telegram ботa:
