@@ -8,6 +8,7 @@ def main() -> None:
 	if Functions.if_find_folder_or_file('./data', 'spotify_music_downloader_telegram_bot.token'):
 		with open('./data/spotify_music_downloader_telegram_bot.token', 'r') as spotify_music_downloader_telegram_bot_token_file:
 			spotify_music_downloader_telegram_bot_token = spotify_music_downloader_telegram_bot_token_file.read()
+			spotify_music_downloader_telegram_bot_token = spotify_music_downloader_telegram_bot_token.replace('\n', '')
 	else:
 		open('./data/spotify_music_downloader_telegram_bot.token', 'w')
 		spotify_music_downloader_telegram_bot_token = ''
