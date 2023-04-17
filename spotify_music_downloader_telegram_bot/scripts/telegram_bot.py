@@ -25,7 +25,7 @@ class SpotifyMusicDownloaderTelegramBot:
 	def downloading_spotify_track(self, context: CallbackContext, user_id: int, message_id: int, message: str):
 		context.bot.send_message(chat_id=user_id, text='Downloading Spotify track...')
 
-		result = subprocess.check_output(['spotdl', message]).decode('UTF-8')
+		result = subprocess.check_output(['python', '-m', 'spotdl', message]).decode('UTF-8')
 		if result.find('"') != -1:
 			spotify_track_name = result.split('"')[1]
 		else:
