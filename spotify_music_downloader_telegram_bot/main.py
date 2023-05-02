@@ -77,7 +77,7 @@ async def check_downloaded_spotify_tracks() -> None:
 		await asyncio.sleep(30 * 60)
 
 async def main() -> None:
-	logger.info('Starting asynchronous function for check downloaded spotify tracks.')
+	logger.info('Start asynchronous function for check downloaded spotify tracks.')
 	
 	asyncio.create_task(check_downloaded_spotify_tracks())
 
