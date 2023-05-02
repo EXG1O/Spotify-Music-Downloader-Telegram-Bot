@@ -1,4 +1,7 @@
 # Папки
 __pycache__/
-data/
 env/
+
+data/
+logs/
+spotify_tracks/
