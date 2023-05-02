@@ -4,8 +4,8 @@
 # Требование
 - Python 3.10.10
 
-# Установка Telegram ботa
-1. Устанавливаем Telegram ботa:
+# Установка проекта
+1. Устанавливаем проекта:
 ```sh
 git clone https://github.com/EXG1O/Spotify-Music-Downloader-Telegram-Bot.git
 cd Spotify-Music-Downloader-Telegram-Bot
@@ -16,25 +16,43 @@ pip install -r requirements.txt
 spotdl --download-ffmpeg
 cd spotify_music_downloader_telegram_bot
 ```
-2. Запускаем Telegram ботa:
+2. Запускаем главный файл:
 ```sh
 python main.py
 ```
 3. Если вы всё правильно сделали, то у вас будет такой вывод:
-```sh
-Enter the Constructor Telegram bot token in the file ./data/spotify_music_downloader_telegram_bot.token!
 ```
-4. Теперь нам нужно создать своего Telegram бота через BotFather Telegram бота (Ссылка на Telegram бота: https://t.me/BotFather);
-5. После создание Telegram бота через BotFather Telegram бота, получаем его API-токен и добавляем его в файл ./data/spotify_music_downloader_telegram_bot.token;
-6. Запускаем ещё раз Telegram ботa:
+Enter the Constructor Telegram bot token in the file ./data/api.token!
+```
+4. Теперь нам нужно создать своего Telegram бота через [BotFather Telegram бота](https://t.me/BotFather);
+5. После создание Telegram бота получаем его API-токен и добавляем его в файл ./data/api.token;
+6. Запускаем ещё раз главный файл:
 ```sh
 python main.py
 ```
-7. Если вы всё сделали правильно, то в файле ./data/spotify_music_downloader_telegram_bot.log будет такое сообщение:
-```log
-[ДАТА И ВРЕМЯ]: INFO > Scheduler started
+7. Теперь в файл ./data/spotify_settings.json нам нужно ввести "client_id" и "client_secret", которые можно получить на сайте [Spotify for Developers](https://developer.spotify.com/dashboard);
+8. Запускаем ещё раз главный файл:
+```sh
+python main.py
 ```
-8. Теперь переходим в вашего ранее созданого Telegram бота через BotFather Telegram бота и пользуемся им 😁
+7. Если вы всё правильно сделали, то в файле ./logs/info.log будут такие сообщения:
+```log
+[ДАТА И ВРЕМЯ]: INFO > Start asynchronous function for check downloaded spotify tracks.
+[ДАТА И ВРЕМЯ]: INFO > Starting Spotify Music Downloader Telegram Bot.
+[ДАТА И ВРЕМЯ]: INFO > Skipped None updates.
+[ДАТА И ВРЕМЯ]: INFO > Start polling.
+```
+8. Теперь переходим в вашего ранее созданого Telegram бота и пользуемся им 😁
 
-# Примечание
-- Все ошибки будут появляться в файле ./data/spotify_music_downloader_telegram_bot.log.
+# Cтруктура проекта
+```sh
+Spotify-Music-Downloader-Telegram-Bot
+├── LICENSE
+├── README.md
+├── requirements.txt
+└── spotify_music_downloader_telegram_bot
+    ├── main.py
+    └── scripts
+        ├── __init__.py
+        └── settings.py
+```
