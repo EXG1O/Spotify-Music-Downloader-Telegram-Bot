@@ -76,7 +76,7 @@ async def check_downloaded_spotify_tracks() -> None:
 		
 		await asyncio.sleep(30 * 60)
 
-async def main() -> None:
+async def start() -> None:
 	logger.info('Start asynchronous function for check downloaded spotify tracks.')
 	
 	asyncio.create_task(check_downloaded_spotify_tracks())
@@ -92,6 +92,6 @@ async def main() -> None:
 
 if __name__ == '__main__':
 	try:
-		loop.run_until_complete(main())
+		loop.run_until_complete(start())
 	except KeyboardInterrupt:
 		loop.stop()
