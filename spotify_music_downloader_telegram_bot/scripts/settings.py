@@ -1,10 +1,12 @@
 from pathlib import Path
 import logging.config
+import sqlite3
 import json
 import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_DIR = BASE_DIR / 'data/DataBase.db'
 
 
 folders = ('data', 'logs', 'spotify_tracks',)
@@ -43,6 +45,17 @@ if SPOTIFY_SETTINGS['client_id'] == '' or SPOTIFY_SETTINGS['client_secret'] == '
 	print(f"Enter \"client_id\" and \"client_secret\" in the file {BASE_DIR / 'data/spotify_settings.json'}!")
 
 	exit()
+
+
+connection = sqlite3.connect(DATABASE_DIR)
+cursor = connection.cursor()
+
+cursor.execute("""
+	CREATE TABLE IF NOT EXISTS User(
+		id INTEGER NOT NULL PRIMARY KEY
+	)
+""")
+connection.commit()
 
 
 LOGGING = {
