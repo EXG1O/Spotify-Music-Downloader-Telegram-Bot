@@ -55,23 +55,33 @@ LOGGING = {
 		},
 	},
 	'handlers': {
-		'debug_file': { 
+		'console': {
 			'level': 'INFO',
-			'class': 'logging.FileHandler',
+			'class': 'logging.StreamHandler',
+			'formatter': 'standard',
+		},
+		'info_file': { 
+			'level': 'INFO',
+			'class': 'logging.handlers.RotatingFileHandler',
 			'filename': BASE_DIR / 'logs/info.log',
+			'maxBytes': 10485760,
+			'backupCount': 10,
 			'formatter': 'standard',
 		},
 		'error_file': { 
 			'level': 'ERROR',
-			'class': 'logging.FileHandler',
+			'class': 'logging.handlers.RotatingFileHandler',
 			'filename': BASE_DIR / 'logs/error.log',
+			'maxBytes': 10485760,
+			'backupCount': 10,
 			'formatter': 'standard',
 		},
 	},
 	'loggers': {
 		'root': {
 			'handlers': [
-				'debug_file',
+				'console',
+				'info_file',
 				'error_file',
 			],
 			'propagate': True,
