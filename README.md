@@ -35,7 +35,7 @@ python main.py
 ```sh
 python main.py
 ```
-7. Если вы всё правильно сделали, то в файле ./logs/info.log будут такие сообщения:
+7. Если вы всё правильно сделали, то в консоли будут такие сообщения:
 ```log
 [ДАТА И ВРЕМЯ]: INFO > Start asynchronous function for check downloaded spotify tracks.
 [ДАТА И ВРЕМЯ]: INFO > Starting Spotify Music Downloader Telegram Bot.
