@@ -2,9 +2,10 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.types import Message, InputFile
 from aiogram import Bot
 
-from scripts.settings import API_TOKEN, BASE_DIR, SPOTIFY_SETTINGS
+from scripts.settings import BASE_DIR, DATABASE_DIR, API_TOKEN, SPOTIFY_SETTINGS
 
 from spotdl import Spotdl, DownloaderOptions
+import aiosqlite
 import asyncio
 import logging
 import time
@@ -28,7 +29,13 @@ spotdl = Spotdl(
 
 @dispatcher.message_handler(commands=['start'])
 async def send_welcome(message: Message) -> None:
-	logger.info(f'{message.from_user.url}: {message.text}')
+	logger.info(f'{message.from_user.id}: {message.text}')
+
+	async with aiosqlite.connect(DATABASE_DIR) as db:
+		async with db.execute('SELECT * FROM User') as cursor:
+			if await cursor.fetchone() is None:
+				await db.execute(f'INSERT INTO User VALUES ({message.from_user.id})')
+				await db.commit()
 
 	if message.from_user.language_code == 'ru':
 		message_text = f"""\
@@ -48,7 +55,7 @@ async def send_welcome(message: Message) -> None:
 
 @dispatcher.message_handler()
 async def send_spotify_track(message: Message) -> None:
-	logger.info(f'{message.from_user.url}: {message.text}')
+	logger.info(f'{message.from_user.id}: {message.text}')
 	if message.text.find('https://open.spotify.com/track/') != -1:
 		if message.from_user.language_code == 'ru':
 			message_text = 'Скачиваю Spotify трек...'
