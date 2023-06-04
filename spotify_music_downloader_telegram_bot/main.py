@@ -33,9 +33,7 @@ async def send_welcome(message: Message) -> None:
 
 	async with aiosqlite.connect(DATABASE_DIR) as db:
 		async with db.execute('SELECT * FROM User') as cursor:
-			user = await cursor.fetchone()
-
-			if user is None:
+			if await cursor.fetchone() is None:
 				await db.execute(f'INSERT INTO User VALUES ({message.from_user.id})')
 				await db.commit()
 

@@ -47,15 +47,17 @@ if SPOTIFY_SETTINGS['client_id'] == '' or SPOTIFY_SETTINGS['client_secret'] == '
 	exit()
 
 
-connection = sqlite3.connect(DATABASE_DIR)
-cursor = connection.cursor()
+db = sqlite3.connect(DATABASE_DIR)
+cursor = db.cursor()
 
 cursor.execute("""
 	CREATE TABLE IF NOT EXISTS User(
 		id INTEGER NOT NULL PRIMARY KEY
 	)
 """)
-connection.commit()
+db.commit()
+
+db.close()
 
 
 LOGGING = {
