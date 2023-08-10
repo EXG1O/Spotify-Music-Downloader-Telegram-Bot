@@ -6,48 +6,45 @@ import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATABASE_DIR = BASE_DIR / 'data/DataBase.db'
+DATABASE_PATH: Path = BASE_DIR / 'data/DataBase.db'
 
 
-folders = ('data', 'logs', 'spotify_tracks',)
+folders = ('data', 'logs', 'spotify_tracks')
 for folder in folders:
-	if os.path.exists(BASE_DIR / folder) is False:
-		os.mkdir(BASE_DIR / folder)
+	os.makedirs(BASE_DIR / folder, exist_ok=True)
 
 
-if os.path.exists(BASE_DIR / 'data/api.token') is False:
-	open(BASE_DIR / 'data/api.token', 'w')
+api_token_path: Path = BASE_DIR / 'data/api.token'
 
-with open(BASE_DIR / 'data/api.token', 'r') as api_token_file:
-	API_TOKEN = api_token_file.read().replace('\n', '')
+if not os.path.exists(api_token_path):
+	open(api_token_path, 'w')
 
-if API_TOKEN == '':
-	print(f"Enter the Spotify Music Downloader Telegram bot API-Token in the file {BASE_DIR / 'data/api.token'}!")
+with open(api_token_path, 'r') as api_token_file:
+	API_TOKEN: str = api_token_file.read().replace('\n', '')
 
+if not API_TOKEN:
+	print(f"Enter the Spotify Music Downloader Telegram bot API-Token in the file {api_token_path}!")
 	exit()
 
 
-if os.path.exists(BASE_DIR / 'data/spotify_settings.json') is False:
-	with open(BASE_DIR / 'data/spotify_settings.json', 'w') as spotify_settings_file:
-		json.dump(
-			obj={
-				'client_id': '',
-				'client_secret': '',
-			},
-			fp=spotify_settings_file,
-			indent=2
-		)
+spotify_settings_path: Path = BASE_DIR / 'data/spotify_settings.json'
 
-with open(BASE_DIR / 'data/spotify_settings.json', 'r') as spotify_settings_file:
-	SPOTIFY_SETTINGS = json.load(spotify_settings_file)
+if not os.path.exists(spotify_settings_path):
+	with open(spotify_settings_path, 'w') as spotify_settings_file:
+		json.dump({
+			'client_id': '',
+			'client_secret': '',
+		}, spotify_settings_file, indent=2)
 
-if SPOTIFY_SETTINGS['client_id'] == '' or SPOTIFY_SETTINGS['client_secret'] == '':
-	print(f"Enter \"client_id\" and \"client_secret\" in the file {BASE_DIR / 'data/spotify_settings.json'}!")
+with open(spotify_settings_path, 'r') as spotify_settings_file:
+	SPOTIFY_SETTINGS: dict = json.load(spotify_settings_file)
 
+if not SPOTIFY_SETTINGS['client_id'] or not SPOTIFY_SETTINGS['client_secret']:
+	print(f"Enter \"client_id\" and \"client_secret\" in the file {spotify_settings_path}!")
 	exit()
 
 
-db = sqlite3.connect(DATABASE_DIR)
+db = sqlite3.connect(DATABASE_PATH)
 cursor = db.cursor()
 
 cursor.execute("""
