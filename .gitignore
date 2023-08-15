@@ -1,7 +1,9 @@
 # Папки
 __pycache__/
 env/
-
-data/
 logs/
 spotify_tracks/
+
+# Файлы
+DataBase.db
+.env
