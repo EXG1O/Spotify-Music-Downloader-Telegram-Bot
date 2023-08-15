@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher, types
 from settings import BASE_DIR, DATABASE_PATH, API_TOKEN, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 
 from spotdl import Spotdl, DownloaderOptions, Song
+from asgiref.sync import sync_to_async
 from pathlib import Path
 import aiosqlite
 import asyncio
@@ -74,14 +75,14 @@ async def send_spotify_track_or_album_tracks(message: types.Message) -> None:
 
 		if link_type == 'track':
 			spotify_track: Song = spotdl.search([message.text])[0]
-			_, spotify_track_path = spotdl.downloader.search_and_download(song=spotify_track)
+			_, spotify_track_path = await sync_to_async(spotdl.downloader.search_and_download)(song=spotify_track)
 
 			await bot.delete_message(chat_id=message.chat.id, message_id=sent_message.message_id)
 			await message.reply_audio(audio=types.InputFile(spotify_track_path))
 			logger.info(f'Spotify Music Downloader Telegram Bot: Sent Spotify track "{spotify_track.display_name}".')
 		else:
 			spotify_album_tracks: list[Path] = spotdl.search([message.text])
-			spotify_album_tracks_paths = [spotdl.downloader.search_and_download(song=spotify_album_track) for spotify_album_track in spotify_album_tracks]
+			spotify_album_tracks_paths = [await sync_to_async(spotdl.downloader.search_and_download)(song=spotify_album_track) for spotify_album_track in spotify_album_tracks]
 
 			await bot.delete_message(chat_id=message.chat.id, message_id=sent_message.message_id)
 
