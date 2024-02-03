@@ -1,25 +1,24 @@
 # Spotify Music Downloader Telegram Bot
-**Spotify Music Downloader Telegram Bot** - Telegram Bot для скачивания музыки с Spotify.
+**Spotify Music Downloader Telegram Bot** - Telegram bot for downloading music from Spotify.
 
-# Требование
-- Python 3.10.12
+# Requirement
+- Python >= 3.10.12
 
-# Установка проекта
-1. Устанавливаем проект:
+# Installing
+Clone the project.
 ```sh
 git clone https://github.com/EXG1O/Spotify-Music-Downloader-Telegram-Bot.git
 cd Spotify-Music-Downloader-Telegram-Bot
+```
+Create a Python environment.
+```sh
+python -m venv env
+```
+Run the script to install the project.
+```sh
 source setup.sh
 ```
-2. Запускаем главный файл:
+Run the Telegram bot.
 ```sh
 python main.py
 ```
-3. Если всё работает, то у вас будет такой вывод в терминал:
-```log
-[ДАТА И ВРЕМЯ]: INFO > Start asynchronous function for check downloaded spotify tracks.
-[ДАТА И ВРЕМЯ]: INFO > Starting Spotify Music Downloader Telegram Bot.
-[ДАТА И ВРЕМЯ]: INFO > Skipped None updates.
-[ДАТА И ВРЕМЯ]: INFO > Start polling.
-```
-4. Теперь переходим в вашего Telegram бота и пользуемся им 😁
