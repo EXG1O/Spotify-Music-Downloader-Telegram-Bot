@@ -1,5 +1,5 @@
 # Spotify Music Downloader Telegram Bot
-**Spotify Music Downloader Telegram Bot** - Telegram bot for downloading music from Spotify.
+**Spotify Music Downloader Telegram Bot** is a Telegram bot for downloading music from Spotify.
 
 # Requirement
 - Python >= 3.10.x
