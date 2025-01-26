@@ -1,8 +1,9 @@
 # Папки
 __pycache__/
+.vscode
 env/
 logs/
-spotify_tracks/
+tracks/
 
 # Файлы
 DataBase.db

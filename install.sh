@@ -3,7 +3,8 @@
 source env/bin/activate
 
 pip install -U pip
-pip install -r requirements.txt
+pip install poetry
+poetry install
 spotdl --download-ffmpeg
 
 echo ""
@@ -16,10 +17,8 @@ read -p "Enter Telegram bot API-Token: " API_TOKEN
 read -p "Enter Spotify client id: " SPOTIFY_CLIENT_ID
 read -p "Enter Spotify client secret: " SPOTIFY_CLIENT_SECRET
 
-cd spotify_music_downloader_telegram_bot
-
 cat << EOF > .env
-API_TOKEN=$API_TOKEN
+BOT_TOKEN=$BOT_TOKEN
 
 SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID
 SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
