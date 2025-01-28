@@ -41,7 +41,5 @@ class Spotify:
             ],
         )
 
-    async def download(self, song: Song) -> tuple[Song, Path]:
-        song, path = await self.downloader.download_song(song=song)
-        assert path
-        return song, path
+    async def download(self, song: Song) -> tuple[Song, Path | None]:
+        return await self.downloader.download_song(song=song)
