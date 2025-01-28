@@ -2,8 +2,11 @@ from asyncer import asyncify
 from spotdl import DownloaderOptions, Song
 from spotdl.download.downloader import Downloader as BaseDownloader
 from spotdl.download.downloader import logger
+from spotdl.utils.config import DOWNLOADER_OPTIONS
 from spotdl.utils.m3u import gen_m3u_files
 from spotdl.utils.search import songs_from_albums
+
+from core.settings import TRACKS_PATH
 
 from asyncio import Semaphore
 from datetime import datetime
@@ -14,7 +17,15 @@ import json
 
 class Downloader(BaseDownloader):
     def __init__(self, settings: DownloaderOptions | None = None):
-        super().__init__(settings)
+        bundle_settings: DownloaderOptions = DOWNLOADER_OPTIONS.copy()
+
+        if settings:
+            bundle_settings.update(settings)
+
+        bundle_settings['simple_tui'] = True
+        bundle_settings['output'] = str(TRACKS_PATH)
+
+        super().__init__(bundle_settings)
 
         self.semaphore = Semaphore(10)
 

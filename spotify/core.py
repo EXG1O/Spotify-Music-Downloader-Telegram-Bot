@@ -1,9 +1,6 @@
 from spotdl import DownloaderOptions, Song
-from spotdl.utils.config import DOWNLOADER_OPTIONS
 from spotdl.utils.search import parse_query
 from spotdl.utils.spotify import SpotifyClient
-
-from core.settings import TRACKS_PATH
 
 from .downloader import Downloader
 
@@ -18,16 +15,7 @@ class Spotify:
         settings: DownloaderOptions | None = None,
     ):
         SpotifyClient.init(client_id=client_id, client_secret=client_secret)
-
-        bundle_settings: DownloaderOptions = DOWNLOADER_OPTIONS.copy()
-
-        if settings:
-            bundle_settings.update(settings)
-
-        bundle_settings['simple_tui'] = True
-        bundle_settings['output'] = str(TRACKS_PATH)
-
-        self.downloader = Downloader(settings=bundle_settings)
+        self.downloader = Downloader(settings)
 
     async def search(self, query: list[str]) -> list[Song]:
         return parse_query(
@@ -42,4 +30,4 @@ class Spotify:
         )
 
     async def download(self, song: Song) -> tuple[Song, Path | None]:
-        return await self.downloader.download_song(song=song)
+        return await self.downloader.download_song(song)

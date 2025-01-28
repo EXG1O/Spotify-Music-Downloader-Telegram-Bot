@@ -29,7 +29,7 @@ dispatcher.update.middleware(CreateUserMiddleware())
 @dispatcher.message(CommandStart())
 async def start_command_handler(message: Message, event_from_user: User) -> None:
     await message.answer(
-        text=(
+        (
             f'Hello, {event_from_user.full_name}!\n\n'
             'I\'m a free <a href="https://github.com/EXG1O/Spotify-Music-Downloader-Telegram-Bot">open-source</a> '
             'Telegram bot for downloading music from Spotify using your link.\n\n'
@@ -47,26 +47,18 @@ async def message_handler(message: Message, event_chat: Chat) -> None:
     assert message.text
 
     bot_message: Message = await message.reply(
-        text=(
-            'Downloading music from the link...\nThis process may take a few minutes.'
-        )
+        'Downloading music from the link...\nThis process may take a few minutes.'
     )
 
     try:
         songs: list[Song] = await spotify.search([message.text])
     except SpotifyException:
         await bot_message.edit_text(
-            text=(
-                'Could not find or download music at the link, '
-                'please try again later or send a different link.'
-            )
+            'Could not find or download music at the link, please try again later or send a different link.'
         )
         return
 
     await asyncio.gather(
-        *[
-            download_and_send_song(bot=bot, chat=event_chat, message=message, song=song)
-            for song in songs
-        ]
+        *[download_and_send_song(bot, event_chat, message, song) for song in songs]
     )
     await bot_message.delete()
