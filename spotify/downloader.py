@@ -1,10 +1,11 @@
 from asyncer import asyncify
-from spotdl import Song
+from spotdl import DownloaderOptions, Song
 from spotdl.download.downloader import Downloader as BaseDownloader
 from spotdl.download.downloader import logger
 from spotdl.utils.m3u import gen_m3u_files
 from spotdl.utils.search import songs_from_albums
 
+from asyncio import Semaphore
 from datetime import datetime
 from pathlib import Path
 import asyncio
@@ -12,6 +13,11 @@ import json
 
 
 class Downloader(BaseDownloader):
+    def __init__(self, settings: DownloaderOptions | None = None):
+        super().__init__(settings)
+
+        self.semaphore = Semaphore(10)
+
     async def download_song(self, song: Song) -> tuple[Song, Path | None]:
         """
         Download a single song.
@@ -62,7 +68,7 @@ class Downloader(BaseDownloader):
         self.progress_handler.set_song_count(len(songs))
 
         results: list[tuple[Song, Path | None]] = await asyncio.gather(
-            *[asyncify(self.search_and_download)(song) for song in songs]
+            *[self.search_and_download(song) for song in songs]
         )
 
         if self.settings['print_errors']:
@@ -122,3 +128,20 @@ class Downloader(BaseDownloader):
             logger.info('Saved results to %s', self.settings['save_file'])
 
         return results
+
+    async def search_and_download(self, song: Song) -> tuple[Song, Path | None]:
+        """
+        Search for the song and download it.
+
+        ### Arguments
+        - song: The song to download.
+
+        ### Returns
+        - tuple with the song and the path to the downloaded file if successful.
+
+        ### Notes
+        - This function is synchronous.
+        """
+
+        async with self.semaphore:
+            return await asyncify(super().search_and_download)(song)
