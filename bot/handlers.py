@@ -1,6 +1,6 @@
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ChatAction, ParseMode
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Chat, Message, User
 
@@ -46,12 +46,16 @@ async def start_command_handler(message: Message, event_from_user: User) -> None
 async def message_handler(message: Message, event_chat: Chat) -> None:
     assert message.text
 
-    await bot.send_chat_action(chat_id=event_chat.id, action=ChatAction.RECORD_VOICE)
+    bot_message: Message = await message.reply(
+        text=(
+            'Downloading music from the link...\nThis process may take a few minutes.'
+        )
+    )
 
     try:
         songs: list[Song] = await spotify.search([message.text])
     except SpotifyException:
-        await message.reply(
+        await bot_message.edit_text(
             text=(
                 'Could not find or download music at the link, '
                 'please try again later or send a different link.'
@@ -59,11 +63,10 @@ async def message_handler(message: Message, event_chat: Chat) -> None:
         )
         return
 
-    await bot.send_chat_action(chat_id=event_chat.id, action=ChatAction.RECORD_VOICE)
-
     await asyncio.gather(
         *[
             download_and_send_song(bot=bot, chat=event_chat, message=message, song=song)
             for song in songs
         ]
     )
+    await bot_message.delete()
