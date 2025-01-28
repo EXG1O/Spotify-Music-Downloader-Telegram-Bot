@@ -13,7 +13,7 @@ async def download_and_send_song(
     bot: Bot, chat: Chat, message: Message, song: Song
 ) -> None:
     try:
-        song, path = await spotify.download(song=song)
+        song, path = await spotify.download(song)
 
         if not path:
             await message.reply(
@@ -24,7 +24,7 @@ async def download_and_send_song(
             )
             return
 
-        await message.reply_audio(audio=FSInputFile(path))
+        await message.reply_audio(FSInputFile(path))
     except TelegramRetryAfter as error:
         await asyncio.sleep(error.retry_after)
         return await download_and_send_song(bot, chat, message, song)
