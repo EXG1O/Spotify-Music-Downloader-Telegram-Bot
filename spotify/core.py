@@ -14,7 +14,9 @@ class Spotify:
         client_secret: str,
         settings: DownloaderOptions | None = None,
     ):
-        SpotifyClient.init(client_id=client_id, client_secret=client_secret)
+        SpotifyClient.init(
+            client_id=client_id, client_secret=client_secret, no_cache=True
+        )
         self.downloader = Downloader(settings)
 
     async def search(self, query: list[str]) -> list[Song]:
