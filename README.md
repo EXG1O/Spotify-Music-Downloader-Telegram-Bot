@@ -18,3 +18,6 @@ To run the bot, run the following command:
 ```bash
 python main.py
 ```
+
+## License  
+This repository is licensed under the [GPL-3.0 License](LICENSE).
