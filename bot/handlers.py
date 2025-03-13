@@ -42,7 +42,7 @@ async def start_command_handler(message: Message, event_from_user: User) -> None
 
 @dispatcher.message()
 async def message_handler(message: Message, event_chat: Chat) -> None:
-    if not message.text or not message.text.startswith(''):
+    if not message.text:
         return None
 
     bot_message: Message = await message.reply(
