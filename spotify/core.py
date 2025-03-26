@@ -30,6 +30,8 @@ class Spotify:
                     self.client_secret,
                     '--threads',
                     str(self.threads),
+                    '--bitrate',
+                    '256k',
                     '--output',
                     str(temp_path),
                     '--log-format',
