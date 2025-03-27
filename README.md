@@ -9,6 +9,7 @@ To install, execute the following commands:
 ```bash
 git clone https://github.com/EXG1O/Spotify-Music-Downloader-Telegram-Bot.git
 cd Spotify-Music-Downloader-Telegram-Bot
+git checkout $(git describe --tags --abbrev=0)
 python -m venv env
 source install.sh
 ```
