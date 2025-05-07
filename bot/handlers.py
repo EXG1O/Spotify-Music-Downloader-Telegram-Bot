@@ -2,15 +2,17 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Chat, FSInputFile, Message, User
+from aiogram.types import Chat, Message, User
 
 from core.settings import BOT_TOKEN
-from spotify import spotify
+from spotify import Song, spotify
 
 from .middlewares import CreateUserMiddleware
 from .session import ResilientSession
+from .utils import reply_song
 
 from pathlib import Path
+import asyncio
 
 bot = Bot(
     token=BOT_TOKEN,
@@ -49,7 +51,10 @@ async def message_handler(message: Message, event_chat: Chat) -> None:
         'Downloading music from the link...\nThis process may take a few minutes.'
     )
 
-    songs: list[Path] | None = await spotify.download(message.text)
+    try:
+        songs: list[tuple[Song, Path | None]] = await spotify.download(message.text)
+    except Exception:
+        songs = []
 
     if not songs:
         await bot_message.edit_text(
@@ -57,6 +62,5 @@ async def message_handler(message: Message, event_chat: Chat) -> None:
         )
         return
 
-    for song in songs:
-        await message.reply_audio(FSInputFile(song))
+    await asyncio.gather(*[reply_song(message, song, path) for song, path in songs])
     await bot_message.delete()
