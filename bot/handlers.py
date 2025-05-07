@@ -2,13 +2,14 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Chat, FSInputFile, Message, User
+from aiogram.types import Chat, Message, User
 
 from core.settings import BOT_TOKEN
 from spotify import Song, spotify
 
 from .middlewares import CreateUserMiddleware
 from .session import ResilientSession
+from .utils import reply_song
 
 from pathlib import Path
 import asyncio
