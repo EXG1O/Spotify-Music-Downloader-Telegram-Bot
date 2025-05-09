@@ -1,10 +1,36 @@
+from spotdl import Spotdl
+from spotdl.types.options import DownloaderOptions
 from spotdl.types.song import Song
 
-from .utils import spotdl_client
+from core.settings import TRACKS_PATH
 
 from asyncio import Semaphore
+from multiprocessing import Pipe, Process
+from multiprocessing.connection import Connection
 from pathlib import Path
+from typing import Final
 import asyncio
+
+SPOTDL_DOWNLOADER_SETTINGS: Final[DownloaderOptions] = {
+    'threads': 1,
+    'bitrate': '256k',
+    'output': str(TRACKS_PATH),
+    'simple_tui': True,
+}
+
+
+def _run_spotdl(
+    connection: Connection, client_id: str, client_secret: str, query: str
+) -> None:
+    "DON'T CALL THIS FUNCTION FROM THE MAIN PROCESS BECAUSE `SpotDL` HAS A MEMORY LEAK."
+    try:
+        spotdl = Spotdl(
+            client_id, client_secret, downloader_settings=SPOTDL_DOWNLOADER_SETTINGS
+        )
+        songs: list[Song] = spotdl.search([query])
+        connection.send(spotdl.download_songs(songs))
+    except Exception:
+        connection.send([])
 
 
 class Spotify:
@@ -12,12 +38,18 @@ class Spotify:
         self.client_id = client_id
         self.client_secret = client_secret
 
-        self.semaphore = Semaphore(10)
+        self.semaphore = Semaphore(2)
 
     def _download(self, query: str) -> list[tuple[Song, Path | None]]:
-        with spotdl_client(self.client_id, self.client_secret) as spotdl:
-            songs: list[Song] = spotdl.search([query])
-            return spotdl.download_songs(songs)
+        parent_connection, child_connection = Pipe()
+
+        process = Process(
+            target=_run_spotdl,
+            args=(child_connection, self.client_id, self.client_secret, query),
+        )
+        process.start()
+
+        return parent_connection.recv()
 
     async def download(self, query: str) -> list[tuple[Song, Path | None]]:
         async with self.semaphore:

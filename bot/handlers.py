@@ -51,10 +51,7 @@ async def message_handler(message: Message) -> None:
         'Downloading music... This might may take a few minutes.'
     )
 
-    try:
-        songs: list[tuple[Song, Path | None]] = await spotify.download(message.text)
-    except Exception:
-        songs = []
+    songs: list[tuple[Song, Path | None]] = await spotify.download(message.text)
 
     if not songs:
         await bot_message.edit_text(
