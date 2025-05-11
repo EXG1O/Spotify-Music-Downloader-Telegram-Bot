@@ -8,7 +8,7 @@ from database import async_session
 from database.models import MusicDownloadQueue
 from spotify import Song, spotify
 
-from .settings import TRACKS_PATH
+from .settings import MAX_TRACK_STORAGE_SIZE, TRACKS_PATH
 
 from collections.abc import Sequence
 from contextlib import suppress
@@ -16,17 +16,24 @@ from pathlib import Path
 from typing import Any
 import asyncio
 import os
-import time
 
 
 async def check_downloaded_track_ages() -> None:
     while True:
-        for track in os.listdir(TRACKS_PATH):
-            track_path: Path = TRACKS_PATH / track
-            track_age: float = time.time() - os.path.getatime(track_path)
+        tracks: list[Path] = [
+            TRACKS_PATH / track_path for track_path in os.listdir(TRACKS_PATH)
+        ]
+        total_size: int = sum(os.path.getsize(track) for track in tracks)
 
-            if track_age > 604800:
-                os.remove(track_path)
+        if total_size > MAX_TRACK_STORAGE_SIZE:
+            for track in sorted(tracks, key=lambda track: os.path.getatime(track)):
+                track_size: int = os.path.getsize(track)
+
+                os.remove(track)
+                total_size -= track_size
+
+                if total_size <= MAX_TRACK_STORAGE_SIZE:
+                    break
 
         await asyncio.sleep(3600)
 
