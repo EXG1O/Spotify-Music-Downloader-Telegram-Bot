@@ -2,7 +2,13 @@ from spotdl import Spotdl
 from spotdl.types.options import DownloaderOptions
 from spotdl.types.song import Song
 
-from core.settings import MAX_PARALLEL_MUSIC_DOWNLOADS, TRACKS_PATH
+from core.settings import (
+    MAX_PARALLEL_MUSIC_DOWNLOADS,
+    MAX_SONGS_PER_DOWNLOAD_REQUEST,
+    TRACKS_PATH,
+)
+
+from .exceptions import TooManySongsPerDownloadRequestError
 
 from asyncio import Semaphore
 from multiprocessing import Pipe, Process
@@ -30,6 +36,11 @@ def _run_spotdl(
             client_id, client_secret, downloader_settings=SPOTDL_DOWNLOADER_SETTINGS
         )
         songs: list[Song] = spotdl.search([query])
+
+        if len(songs) > MAX_SONGS_PER_DOWNLOAD_REQUEST:
+            connection.send(TooManySongsPerDownloadRequestError())
+            return
+
         connection.send(spotdl.download_songs(songs))
     except Exception:
         connection.send([])
@@ -49,7 +60,12 @@ class Spotify:
         )
         process.start()
 
-        return parent_connection.recv()
+        result: list[tuple[Song, Path | None]] | Exception = parent_connection.recv()
+
+        if isinstance(result, Exception):
+            raise result
+
+        return result
 
     async def download(self, query: str) -> list[tuple[Song, Path | None]]:
         async with spotify_download_semaphore:
