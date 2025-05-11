@@ -9,6 +9,7 @@ sqlalchemy = "^2.0.37"
 psycopg = "^3.2.4"
 spotdl = "^4.2.11"
 asyncer = "^0.0.8"
+alembic = "^1.15.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.9.3"
