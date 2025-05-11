@@ -2,7 +2,7 @@ from spotdl import Spotdl
 from spotdl.types.options import DownloaderOptions
 from spotdl.types.song import Song
 
-from core.settings import TRACKS_PATH
+from core.settings import MAX_PARALLEL_MUSIC_DOWNLOADS, TRACKS_PATH
 
 from asyncio import Semaphore
 from multiprocessing import Pipe, Process
@@ -10,6 +10,8 @@ from multiprocessing.connection import Connection
 from pathlib import Path
 from typing import Final
 import asyncio
+
+spotify_download_semaphore = Semaphore(MAX_PARALLEL_MUSIC_DOWNLOADS)
 
 SPOTDL_DOWNLOADER_SETTINGS: Final[DownloaderOptions] = {
     'threads': 1,
@@ -38,8 +40,6 @@ class Spotify:
         self.client_id = client_id
         self.client_secret = client_secret
 
-        self.semaphore = Semaphore(2)
-
     def _download(self, query: str) -> list[tuple[Song, Path | None]]:
         parent_connection, child_connection = Pipe()
 
@@ -52,5 +52,5 @@ class Spotify:
         return parent_connection.recv()
 
     async def download(self, query: str) -> list[tuple[Song, Path | None]]:
-        async with self.semaphore:
+        async with spotify_download_semaphore:
             return await asyncio.to_thread(self._download, query)
