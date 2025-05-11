@@ -20,6 +20,7 @@ POSTGRESQL_DATABASE_NAME: Final[str] = os.environ['POSTGRESQL_DATABASE_NAME']
 POSTGRESQL_DATABASE_USER: Final[str] = os.environ['POSTGRESQL_DATABASE_USER']
 POSTGRESQL_DATABASE_PASSWORD: Final[str] = os.environ['POSTGRESQL_DATABASE_PASSWORD']
 
+LOGS_PATH: Final[Path] = BASE_DIR / 'logs'
 TRACKS_PATH: Final[Path] = BASE_DIR / 'tracks'
 
 LOGGING: Final[dict[str, Any]] = {
@@ -67,7 +68,7 @@ LOGGING: Final[dict[str, Any]] = {
     },
 }
 
-os.makedirs(BASE_DIR / 'logs', exist_ok=True)
-os.makedirs(TRACKS_PATH, exist_ok=True)
+LOGS_PATH.mkdir(exist_ok=True)
+TRACKS_PATH.mkdir(exist_ok=True)
 
 logging.config.dictConfig(LOGGING)
