@@ -28,6 +28,9 @@ DATABASE_URL: Final[str] = (
 MAX_PARALLEL_MUSIC_DOWNLOADS: Final[int] = int(
     os.getenv('MAX_PARALLEL_MUSIC_DOWNLOADS', '5')
 )
+MAX_TRACK_STORAGE_SIZE: Final[int] = int(
+    os.getenv('MAX_TRACK_STORAGE_SIZE', '1073741824')
+)
 
 LOGS_PATH: Final[Path] = BASE_DIR / 'logs'
 TRACKS_PATH: Final[Path] = BASE_DIR / 'tracks'
