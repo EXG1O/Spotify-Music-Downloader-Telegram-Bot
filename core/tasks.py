@@ -48,10 +48,6 @@ async def process_music_download_request(request_id: int) -> None:
             'chat_id': chat_id,
             'message_id': bot_message_id,
         }
-        user_message_kwargs: dict[str, Any] = {
-            'chat_id': chat_id,
-            'message_id': user_message_id,
-        }
 
         songs: list[tuple[Song, Path | None]] = await spotify.download(request.query)
 
@@ -68,7 +64,12 @@ async def process_music_download_request(request_id: int) -> None:
 
             await asyncio.gather(
                 *[
-                    reply_song(**user_message_kwargs, song=song, song_path=path)
+                    reply_song(
+                        chat_id=chat_id,
+                        user_message_id=user_message_id,
+                        song=song,
+                        song_path=path,
+                    )
                     for song, path in songs
                 ]
             )
