@@ -1,10 +1,6 @@
-# Папки
 __pycache__/
 .vscode
 env/
 logs/
 tracks/
-
-# Файлы
-DataBase.db
 .env
