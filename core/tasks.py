@@ -23,7 +23,7 @@ import asyncio
 import os
 
 
-async def check_downloaded_track_ages() -> None:
+async def cleanup_old_tracks() -> None:
     while True:
         tracks: list[Path] = [
             TRACKS_PATH / track_path for track_path in os.listdir(TRACKS_PATH)
@@ -40,7 +40,7 @@ async def check_downloaded_track_ages() -> None:
                 if total_size <= MAX_TRACK_STORAGE_SIZE:
                     break
 
-        await asyncio.sleep(3600)
+        await asyncio.sleep(60)
 
 
 async def process_music_download_request(request_id: int) -> None:
@@ -116,5 +116,5 @@ async def process_music_download_queue() -> None:
 
 
 async def run_tasks() -> None:
-    asyncio.create_task(check_downloaded_track_ages())
+    asyncio.create_task(cleanup_old_tracks())
     asyncio.create_task(process_music_download_queue())
