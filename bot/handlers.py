@@ -2,17 +2,14 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message, User
+from aiogram.types import Chat, Message, User
 
 from core.settings import BOT_TOKEN
-from spotify import Song, spotify
+from database import async_session
+from database.models import MusicDownloadQueue
 
 from .middlewares import CreateUserMiddleware
 from .session import ResilientSession
-from .utils import reply_song
-
-from pathlib import Path
-import asyncio
 
 bot = Bot(
     token=BOT_TOKEN,
@@ -43,21 +40,23 @@ async def start_command_handler(message: Message, event_from_user: User) -> None
 
 
 @dispatcher.message()
-async def message_handler(message: Message) -> None:
-    if not message.text:
+async def message_handler(message: Message, event_chat: Chat) -> None:
+    query: str | None = message.text
+
+    if not query:
         return None
 
     bot_message: Message = await message.reply(
         'Downloading music... This might may take a few minutes.'
     )
 
-    songs: list[tuple[Song, Path | None]] = await spotify.download(message.text)
-
-    if not songs:
-        await bot_message.edit_text(
-            "I couldn't download anything from this link. Please try another one"
+    async with async_session() as session:
+        session.add(
+            MusicDownloadQueue(
+                chat_id=event_chat.id,
+                bot_message_id=bot_message.message_id,
+                user_message_id=message.message_id,
+                query=query,
+            )
         )
-        return
-
-    await asyncio.gather(*[reply_song(message, song, path) for song, path in songs])
-    await bot_message.delete()
+        await session.commit()

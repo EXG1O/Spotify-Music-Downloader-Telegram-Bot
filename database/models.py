@@ -18,3 +18,16 @@ class User(Base):
     joined_date: Mapped[datetime] = mapped_column(
         TIMESTAMP(), server_default=text('NOW()')
     )
+
+
+class MusicDownloadQueue(Base):
+    __tablename__ = 'music_download_queue'
+
+    id: Mapped[int] = mapped_column(BIGINT(), primary_key=True)
+    chat_id: Mapped[int] = mapped_column(BIGINT())
+    bot_message_id: Mapped[int] = mapped_column(BIGINT())
+    user_message_id: Mapped[int] = mapped_column(BIGINT())
+    query: Mapped[str] = mapped_column()
+    queued_date: Mapped[datetime] = mapped_column(
+        TIMESTAMP(), server_default=text('NOW()')
+    )
