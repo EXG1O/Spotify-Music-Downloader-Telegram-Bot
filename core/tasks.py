@@ -40,7 +40,7 @@ async def cleanup_old_tracks() -> None:
                 if total_size <= MAX_TRACK_STORAGE_SIZE:
                     break
 
-        await asyncio.sleep(3600)
+        await asyncio.sleep(60)
 
 
 async def process_music_download_request(request_id: int) -> None:
