@@ -1,0 +1,2 @@
+class TooManySongsPerDownloadRequestError(Exception):
+    pass

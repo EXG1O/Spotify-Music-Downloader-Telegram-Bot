@@ -7,8 +7,13 @@ from bot.utils import reply_song
 from database import async_session
 from database.models import MusicDownloadQueue
 from spotify import Song, spotify
+from spotify.exceptions import TooManySongsPerDownloadRequestError
 
-from .settings import MAX_TRACK_STORAGE_SIZE, TRACKS_PATH
+from .settings import (
+    MAX_SONGS_PER_DOWNLOAD_REQUEST,
+    MAX_TRACK_STORAGE_SIZE,
+    TRACKS_PATH,
+)
 
 from collections.abc import Sequence
 from contextlib import suppress
@@ -56,31 +61,41 @@ async def process_music_download_request(request_id: int) -> None:
             'message_id': bot_message_id,
         }
 
-        songs: list[tuple[Song, Path | None]] = await spotify.download(request.query)
-
         with suppress(TelegramAPIError):
-            if not songs:
+            try:
+                songs: list[tuple[Song, Path | None]] = await spotify.download(
+                    request.query
+                )
+
+                if songs:
+                    await asyncio.gather(
+                        *[
+                            reply_song(
+                                chat_id=chat_id,
+                                user_message_id=user_message_id,
+                                song=song,
+                                song_path=path,
+                            )
+                            for song, path in songs
+                        ]
+                    )
+                    await bot.delete_message(**bot_message_kwargs)
+                else:
+                    await bot.edit_message_text(
+                        **bot_message_kwargs,
+                        text=(
+                            "I couldn't download anything from this link."
+                            'Please try another one'
+                        ),
+                    )
+            except TooManySongsPerDownloadRequestError:
                 await bot.edit_message_text(
                     **bot_message_kwargs,
                     text=(
-                        "I couldn't download anything from this link."
-                        'Please try another one'
+                        f'We found more than {MAX_SONGS_PER_DOWNLOAD_REQUEST} songs at your link, '
+                        'which exceeds the limit for adding songs to the download queue.'
                     ),
                 )
-                return
-
-            await asyncio.gather(
-                *[
-                    reply_song(
-                        chat_id=chat_id,
-                        user_message_id=user_message_id,
-                        song=song,
-                        song_path=path,
-                    )
-                    for song, path in songs
-                ]
-            )
-            await bot.delete_message(**bot_message_kwargs)
 
         await session.delete(request)
         await session.commit()
