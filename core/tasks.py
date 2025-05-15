@@ -1,6 +1,6 @@
 from aiogram.exceptions import TelegramAPIError
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from bot import bot
 from bot.utils import reply_song
@@ -49,55 +49,58 @@ async def process_music_download_request(request_id: int) -> None:
             select(MusicDownloadQueue).where(MusicDownloadQueue.id == request_id)
         )
 
-        if not request:
-            return
+    if not request:
+        return
 
-        chat_id: int = request.chat_id
-        bot_message_id: int = request.bot_message_id
-        user_message_id: int = request.user_message_id
+    chat_id: int = request.chat_id
+    bot_message_id: int = request.bot_message_id
+    user_message_id: int = request.user_message_id
 
-        bot_message_kwargs: dict[str, Any] = {
-            'chat_id': chat_id,
-            'message_id': bot_message_id,
-        }
+    bot_message_kwargs: dict[str, Any] = {
+        'chat_id': chat_id,
+        'message_id': bot_message_id,
+    }
 
-        with suppress(TelegramAPIError):
-            try:
-                songs: list[tuple[Song, Path | None]] = await spotify.download(
-                    request.query
+    with suppress(TelegramAPIError):
+        try:
+            songs: list[tuple[Song, Path | None]] = await spotify.download(
+                request.query
+            )
+
+            if songs:
+                await asyncio.gather(
+                    *[
+                        reply_song(
+                            chat_id=chat_id,
+                            user_message_id=user_message_id,
+                            song=song,
+                            song_path=path,
+                        )
+                        for song, path in songs
+                    ]
                 )
-
-                if songs:
-                    await asyncio.gather(
-                        *[
-                            reply_song(
-                                chat_id=chat_id,
-                                user_message_id=user_message_id,
-                                song=song,
-                                song_path=path,
-                            )
-                            for song, path in songs
-                        ]
-                    )
-                    await bot.delete_message(**bot_message_kwargs)
-                else:
-                    await bot.edit_message_text(
-                        **bot_message_kwargs,
-                        text=(
-                            "I couldn't download anything from this link."
-                            'Please try another one'
-                        ),
-                    )
-            except TooManySongsPerDownloadRequestError:
+                await bot.delete_message(**bot_message_kwargs)
+            else:
                 await bot.edit_message_text(
                     **bot_message_kwargs,
                     text=(
-                        f'We found more than {MAX_SONGS_PER_DOWNLOAD_REQUEST} songs at your link, '
-                        'which exceeds the limit for adding songs to the download queue.'
+                        "I couldn't download anything from this link. "
+                        'Please try another one'
                     ),
                 )
+        except TooManySongsPerDownloadRequestError:
+            await bot.edit_message_text(
+                **bot_message_kwargs,
+                text=(
+                    f'We found more than {MAX_SONGS_PER_DOWNLOAD_REQUEST} songs at your link, '
+                    'which exceeds the limit for adding songs to the download queue.'
+                ),
+            )
 
-        await session.delete(request)
+    async with async_session() as session:
+        await session.execute(
+            delete(MusicDownloadQueue).where(MusicDownloadQueue.id == request.id)
+        )
         await session.commit()
 
 
