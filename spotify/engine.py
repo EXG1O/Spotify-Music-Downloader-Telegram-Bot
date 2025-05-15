@@ -1,6 +1,7 @@
 from spotdl import Spotdl
 from spotdl.types.options import DownloaderOptions
 from spotdl.types.song import Song
+from spotdl.utils.search import get_simple_songs
 
 from core.settings import (
     MAX_PARALLEL_MUSIC_DOWNLOADS,
@@ -35,7 +36,7 @@ def _run_spotdl(
         spotdl = Spotdl(
             client_id, client_secret, downloader_settings=SPOTDL_DOWNLOADER_SETTINGS
         )
-        songs: list[Song] = spotdl.search([query])
+        songs: list[Song] = get_simple_songs([query])
 
         if len(songs) > MAX_SONGS_PER_DOWNLOAD_REQUEST:
             connection.send(TooManySongsPerDownloadRequestError())
